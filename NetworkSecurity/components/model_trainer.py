@@ -35,6 +35,9 @@ from sklearn.ensemble import (
     RandomForestClassifier
 )
 
+import mlflow
+import mlflow.sklearn
+
 
 class ModelTrainer:
 
@@ -46,6 +49,27 @@ class ModelTrainer:
         try:
             self.model_trainer_config = model_trainer_config
             self.data_transformation_artifact = data_transformation_artifact
+
+        except Exception as e:
+            raise NetworkSecurityException(e, sys)
+
+    def track_mlflow(self, best_model, classificationmetric):
+        try:
+            with mlflow.start_run():
+
+                f1_score = classificationmetric.f1_score
+                precision_score = classificationmetric.precision_score
+                recall_score = classificationmetric.recall_score
+
+                mlflow.log_metric("f1_score", float(f1_score))
+                mlflow.log_metric("precision_score", float(precision_score))
+                mlflow.log_metric("recall_score", float(recall_score))
+
+                mlflow.sklearn.log_model(
+                    sk_model=best_model,
+                    name="model",
+                    skops_trusted_types = ["sklearn.tree._tree.Tree"]
+                )
 
         except Exception as e:
             raise NetworkSecurityException(e, sys)
@@ -96,13 +120,13 @@ class ModelTrainer:
             if not model_report:
                 raise Exception("Model evaluation returned no results.")
 
+            # Get the best model score
             best_model_score = max(model_report.values())
 
-            best_model_name = next(
-                name
-                for name, score in model_report.items()
-                if score == best_model_score
-            )
+            # Get the best model name
+            best_model_name = list(model_report.keys())[
+                list(model_report.values()).index(best_model_score)
+            ]
 
             best_model = models[best_model_name]
 
@@ -119,12 +143,24 @@ class ModelTrainer:
                 y_pred=y_train_pred
             )
 
+            # Track MLflow training metrics
+            self.track_mlflow(
+                best_model,
+                classification_train_metric
+            )
+
             # Calculate testing metrics
             y_test_pred = best_model.predict(X_test)
 
             classification_test_metric = get_classification_score(
                 y_true=y_test,
                 y_pred=y_test_pred
+            )
+
+            # Track MLflow testing metrics
+            self.track_mlflow(
+                best_model,
+                classification_test_metric
             )
 
             # Load the fitted preprocessing object
@@ -135,14 +171,14 @@ class ModelTrainer:
                 )
             )
 
-            # Create the directory for the trained model
+            # Create the model directory
             model_dir_path = os.path.dirname(
                 self.model_trainer_config.trained_model_file_path
             )
 
             os.makedirs(model_dir_path, exist_ok=True)
 
-            # Combine the preprocessor and trained model
+            # Combine preprocessor and trained model
             network_model = NetworkModel(
                 preprocessor=preprocessor,
                 model=best_model
@@ -154,7 +190,7 @@ class ModelTrainer:
                 obj=network_model
             )
 
-            # Create and return the model trainer artifact
+            # Create ModelTrainerArtifact
             model_trainer_artifact = ModelTrainerArtifact(
                 trained_model_file_path=(
                     self.model_trainer_config.trained_model_file_path
@@ -164,7 +200,8 @@ class ModelTrainer:
             )
 
             logging.info(
-                f"Model training completed successfully: {model_trainer_artifact}"
+                f"Model training completed successfully: "
+                f"{model_trainer_artifact}"
             )
 
             return model_trainer_artifact
@@ -174,7 +211,6 @@ class ModelTrainer:
 
     def initiate_model_trainer(self) -> ModelTrainerArtifact:
         try:
-            # Get the transformed train and test file paths
             train_file_path = (
                 self.data_transformation_artifact.transformed_train_file_path
             )
@@ -183,18 +219,18 @@ class ModelTrainer:
                 self.data_transformation_artifact.transformed_test_file_path
             )
 
-            # Load the transformed NumPy arrays
+            # Load training and testing arrays
             train_arr = load_numpy_array_data(train_file_path)
             test_arr = load_numpy_array_data(test_file_path)
 
-            # Separate features (X) and target (y)
+            # Separate features and target
             X_train = train_arr[:, :-1]
             y_train = train_arr[:, -1]
 
             X_test = test_arr[:, :-1]
             y_test = test_arr[:, -1]
 
-            # Train models and receive the artifact
+            # Train the model
             model_trainer_artifact = self.train_model(
                 X_train=X_train,
                 y_train=y_train,
