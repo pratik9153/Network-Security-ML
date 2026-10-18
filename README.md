@@ -216,3 +216,8 @@ Before deployment, verify that the Docker image includes the required model and 
 ## Current Project Status
 
 The local FastAPI prediction endpoint has returned `200 OK` during testing. Evaluate the model on a held-out dataset and report measured metrics before making performance claims. Docker/AWS configuration should be tested separately before describing cloud deployment as complete.
+
+
+
+<img width="1840" height="1032" alt="Screenshot 2026-10-18 175720" src="https://github.com/user-attachments/assets/f3e00e7b-8675-4f5d-8f32-37a326fe8900" />
+
