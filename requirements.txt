@@ -1,11 +1,15 @@
-pandas 
-numpy 
-python-dotenv 
+pandas
+numpy
+python-dotenv
 pymongo
 certifi
 scikit-learn
 dill
-pyaml
+PyYAML
 mlflow
+dagshub
+fastapi
+uvicorn
+
 
 ##-e .
