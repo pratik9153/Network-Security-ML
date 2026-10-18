@@ -4,8 +4,11 @@ An end-to-end machine learning project that classifies phishing-related records 
 
 <img width="1840" height="1032" alt="Screenshot 2026-10-18 175720" src="https://github.com/user-attachments/assets/f3e00e7b-8675-4f5d-8f32-37a326fe8900" />
 
-<img width="1797" height="896" alt="Screenshot 2026-10-18 160525" src="https://github.com/user-attachments/assets/e2d2cd12-1f24-4911-99da-c711d56b732a" />
+<img width="1912" height="1016" alt="Screenshot 2026-10-18 232452" src="https://github.com/user-attachments/assets/e8bea71a-d1d3-40b6-af54-64de0c3e7ddf" />
 
+<img width="1917" height="916" alt="Screenshot 2026-10-18 232802" src="https://github.com/user-attachments/assets/8f408112-355c-416e-abf3-4fa727241b1d" />
+
+<img width="1916" height="1000" alt="Screenshot 2026-10-18 232734" src="https://github.com/user-attachments/assets/44e53ce2-6917-495d-b2a7-82f5458a079c" />
 
 ## Overview
 
