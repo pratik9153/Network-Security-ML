@@ -2,6 +2,11 @@
 
 An end-to-end machine learning project that classifies phishing-related records using website and URL features. The project includes a modular training pipeline and a FastAPI application for generating predictions from uploaded CSV files.
 
+<img width="1840" height="1032" alt="Screenshot 2026-10-18 175720" src="https://github.com/user-attachments/assets/f3e00e7b-8675-4f5d-8f32-37a326fe8900" />
+
+<img width="1797" height="896" alt="Screenshot 2026-10-18 160525" src="https://github.com/user-attachments/assets/e2d2cd12-1f24-4911-99da-c711d56b732a" />
+
+
 ## Overview
 
 The pipeline is organized into independent stages:
@@ -219,5 +224,4 @@ The local FastAPI prediction endpoint has returned `200 OK` during testing. Eval
 
 
 
-<img width="1840" height="1032" alt="Screenshot 2026-10-18 175720" src="https://github.com/user-attachments/assets/f3e00e7b-8675-4f5d-8f32-37a326fe8900" />
 
