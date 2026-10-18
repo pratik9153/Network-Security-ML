@@ -39,9 +39,12 @@ import mlflow
 import mlflow.sklearn
 
 import dagshub
-dagshub.init(repo_owner='pratikchoudhary316', repo_name='Network-Security-ML', mlflow=True)
 
-
+dagshub.init(
+    repo_owner="pratikchoudhary316",
+    repo_name="Network-Security-ML",
+    mlflow=True
+)
 
 
 class ModelTrainer:
@@ -56,7 +59,7 @@ class ModelTrainer:
             self.data_transformation_artifact = data_transformation_artifact
 
         except Exception as e:
-            raise NetworkSecurityException(e, sys)
+            raise NetworkSecurityException(e, sys) from e
 
     def track_mlflow(self, best_model, classificationmetric):
         try:
@@ -67,17 +70,26 @@ class ModelTrainer:
                 recall_score = classificationmetric.recall_score
 
                 mlflow.log_metric("f1_score", float(f1_score))
-                mlflow.log_metric("precision_score", float(precision_score))
-                mlflow.log_metric("recall_score", float(recall_score))
+                mlflow.log_metric(
+                    "precision_score",
+                    float(precision_score)
+                )
+                mlflow.log_metric(
+                    "recall_score",
+                    float(recall_score)
+                )
 
+                # FIX: Use pickle serialization instead of skops.
+                # This avoids the skops trusted-type error for
+                # sklearn.tree._tree.Tree in your own trained model.
                 mlflow.sklearn.log_model(
                     sk_model=best_model,
                     name="model",
-                    skops_trusted_types = ["sklearn.tree._tree.Tree"]
+                    serialization_format="pickle"
                 )
 
         except Exception as e:
-            raise NetworkSecurityException(e, sys)
+            raise NetworkSecurityException(e, sys) from e
 
     def train_model(self, X_train, y_train, X_test, y_test):
         try:
@@ -194,7 +206,14 @@ class ModelTrainer:
                 file_path=self.model_trainer_config.trained_model_file_path,
                 obj=network_model
             )
-            save_object("final_model/model.pkl",best_model)
+
+            # Preserve your existing final model save path
+            os.makedirs("final_model", exist_ok=True)
+
+            save_object(
+                file_path="final_model/model.pkl",
+                obj=best_model
+            )
 
             # Create ModelTrainerArtifact
             model_trainer_artifact = ModelTrainerArtifact(
@@ -213,7 +232,7 @@ class ModelTrainer:
             return model_trainer_artifact
 
         except Exception as e:
-            raise NetworkSecurityException(e, sys)
+            raise NetworkSecurityException(e, sys) from e
 
     def initiate_model_trainer(self) -> ModelTrainerArtifact:
         try:
@@ -247,4 +266,4 @@ class ModelTrainer:
             return model_trainer_artifact
 
         except Exception as e:
-            raise NetworkSecurityException(e, sys)
+            raise NetworkSecurityException(e, sys) from e
